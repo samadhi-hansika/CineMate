@@ -13,6 +13,7 @@ const CineApp = {
   STORAGE_CONTINUE: "cinemate_continue_watching_v1",
   STORAGE_RATED: "cinemate_rated_v1",
   STORAGE_USER: "cinemate_user_session_v1",
+  STORAGE_SESSION_USER: "cinemate_user_session_current",
   STORAGE_SETTINGS: "cinemate_settings_v1",
 
   // State
@@ -60,27 +61,19 @@ const CineApp = {
       ];
       this.ratedMovies = JSON.parse(localStorage.getItem(this.STORAGE_RATED)) || {};
 
-      const storedUser = localStorage.getItem(this.STORAGE_USER);
+      const storedUser =
+        localStorage.getItem(this.STORAGE_USER) ||
+        sessionStorage.getItem(this.STORAGE_SESSION_USER);
       if (storedUser) {
         this.currentUser = JSON.parse(storedUser);
       } else {
-        this.currentUser = {
-          name: "Samadhi",
-          email: "samadhi@cinemate.io",
-          plan: "Ultra HD 4K",
-          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-        };
+        this.currentUser = null;
       }
     } catch (e) {
       this.watchlist = ["interstellar", "dune-part-two"];
       this.continueWatching = [];
       this.ratedMovies = {};
-      this.currentUser = {
-        name: "Samadhi",
-        email: "samadhi@cinemate.io",
-        plan: "Ultra HD 4K",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-      };
+      this.currentUser = null;
     }
   },
 
@@ -389,6 +382,10 @@ const CineApp = {
 
     if (remember) {
       localStorage.setItem(this.STORAGE_USER, JSON.stringify(this.currentUser));
+      sessionStorage.removeItem(this.STORAGE_SESSION_USER);
+    } else {
+      sessionStorage.setItem(this.STORAGE_SESSION_USER, JSON.stringify(this.currentUser));
+      localStorage.removeItem(this.STORAGE_USER);
     }
     this.updateAuthUI();
     this.closeAuthModal();
@@ -409,6 +406,7 @@ const CineApp = {
     };
 
     localStorage.setItem(this.STORAGE_USER, JSON.stringify(this.currentUser));
+    sessionStorage.removeItem(this.STORAGE_SESSION_USER);
     this.updateAuthUI();
     this.closeAuthModal();
     this.showToast(`Welcome to CineMate, ${name}! Your account is active.`, "success");
@@ -422,6 +420,7 @@ const CineApp = {
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
     };
     localStorage.setItem(this.STORAGE_USER, JSON.stringify(this.currentUser));
+    sessionStorage.removeItem(this.STORAGE_SESSION_USER);
     this.updateAuthUI();
     this.closeAuthModal();
     this.showToast("Logged in with Demo VIP Account!", "success");
@@ -430,6 +429,7 @@ const CineApp = {
   logout() {
     this.currentUser = null;
     localStorage.removeItem(this.STORAGE_USER);
+    sessionStorage.removeItem(this.STORAGE_SESSION_USER);
     this.updateAuthUI();
     this.showToast("Signed out successfully. See you soon!");
   },
@@ -611,10 +611,9 @@ const CineApp = {
     const themeSelect = document.getElementById("settings-theme");
 
     if (nameInput && nameInput.value.trim() !== "") {
-      if (!this.currentUser) {
-        this.currentUser = { name: "Samadhi", email: "samadhi@cinemate.io", plan: "Ultra HD 4K", avatar: "" };
+      if (this.currentUser) {
+        this.currentUser.name = nameInput.value.trim();
       }
-      this.currentUser.name = nameInput.value.trim();
     }
 
     if (emailInput && emailInput.value.trim() !== "" && this.currentUser) {

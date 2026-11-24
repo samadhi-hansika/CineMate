@@ -44,6 +44,11 @@
   - Live count badge in the navigation bar.
   - Dedicated `favourites.html` page to manage saved titles.
 
+- **Authentication Behavior**:
+  - Visitors start signed out. The Samadhi profile appears only after Demo Login or account registration.
+  - Enable "Remember me" to persist login in `localStorage`; otherwise, login lasts only for the current browser tab session.
+  - This frontend demo uses browser storage and is not server-based authentication. Real account login across devices requires a backend, database, secure password hashing, and session or token authentication.
+
 - **Fully Responsive & Clean Code**:
   - Optimized for desktop, laptops, tablets, and smartphones.
   - Modular vanilla JavaScript (`movies-data.js`, `app.js`) and high-performance CSS (`style.css`).
