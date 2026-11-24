@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Watchlist — CineMate</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-left">
+      <a href="index.html" class="logo">
+        <span>🎬 CineMate</span>
+        <span class="logo-badge">STREAM</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="movies.html">Movies</a></li>
+        <li><a href="tv-shows.html">TV Shows</a></li>
+        <li><a href="favourites.html" class="active">My List <span class="watchlist-counter">0</span></a></li>
+      </ul>
+    </div>
+
+    <div class="nav-right">
+      <div class="nav-search-box">
+        <button class="nav-search-btn" id="nav-search-btn" title="Search">🔍</button>
+        <input type="text" id="nav-search-input" placeholder="Search saved...">
+      </div>
+
+      <div class="notif-container">
+        <button class="icon-trigger notif-trigger" title="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="dropdown-menu notif-menu">
+          <div class="menu-header">Notifications</div>
+          <div class="notif-item">
+            <strong>❤️ Watchlist sync</strong>
+            <span>Your list is backed up locally.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header Auth Buttons (Sign In & Sign Up) -->
+      <div class="nav-auth-buttons" id="nav-auth-buttons" style="display: none;">
+        <button class="nav-signin-btn" id="nav-signin-btn">Sign In</button>
+        <button class="nav-signup-btn" id="nav-signup-btn">Sign Up</button>
+      </div>
+
+      <div class="profile-container">
+        <div class="profile-trigger" title="Account">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Samadhi" class="profile-avatar" id="profile-user-avatar">
+        </div>
+        <div class="dropdown-menu profile-menu">
+          <div class="menu-header">Signed in as <strong id="profile-user-name">Samadhi</strong></div>
+          <div class="profile-item" style="color: var(--text-muted); font-size: 11px;" id="profile-user-email">samadhi@cinemate.io</div>
+          <a href="favourites.html" class="profile-item">❤️ My Watchlist</a>
+          <a href="movies.html" class="profile-item">🎬 Explore Movies</a>
+          <div class="profile-item" onclick="CineApp.openAuthModal('signin')">🔑 Switch Account / Sign In</div>
+          <div class="profile-item" onclick="CineApp.openAuthModal('signup')">✨ Create Account (Sign Up)</div>
+          <div class="profile-item" onclick="CineApp.openHelpModal()">❓ Help Center & FAQ</div>
+          <div class="profile-item" id="profile-signout-btn" style="border-top: 1px solid var(--border-subtle); margin-top: 4px; color: #ff5252; cursor: pointer;">🚪 Sign Out</div>
+        </div>
+      </div>
+
+      <button class="mobile-menu-btn" aria-label="Toggle navigation">☰</button>
+    </div>
+  </header>
+
+  <!-- My List Header -->
+  <section class="content-section" style="padding-top: 120px; min-height: 80vh;">
+    <div class="row-header" style="margin-bottom: 24px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px;">
+      <div>
+        <h1 class="row-title" style="font-size: 28px;">❤️ My Watchlist</h1>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">Titles you have saved to watch later on CineMate.</p>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span id="watchlist-count-display" style="color: var(--brand-cyan); font-weight: 600; font-size: 15px;">0 Titles</span>
+        <button id="clear-watchlist-btn" class="search-reset-btn" style="display: none; padding: 6px 14px; font-size: 12px;" onclick="clearAllWatchlist()">Clear All</button>
+      </div>
+    </div>
+
+    <!-- My List Movies Grid -->
+    <div class="movie-grid" id="my-list-grid"></div>
+  </section>
+
+  <!-- Netflix Movie Info Modal -->
+  <div class="modal-overlay" id="movie-modal">
+    <div class="modal-container">
+      <button class="modal-close-btn" id="modal-close-btn">✕</button>
+      <div class="modal-backdrop-banner" id="modal-backdrop">
+        <div class="modal-banner-content">
+          <h2 id="modal-title">Movie Title</h2>
+          <div class="modal-btn-row">
+            <button class="modal-btn play" id="modal-play-btn"><span>▶</span> Play</button>
+            <button class="modal-btn list" id="modal-list-btn"><span class="btn-icon">+</span> My List</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-meta-grid">
+          <div class="modal-details-left">
+            <div class="modal-tags-row">
+              <span class="match" id="modal-match">98% Match</span>
+              <span class="meta-badge" id="modal-year">2024</span>
+              <span class="meta-badge" id="modal-age">16+</span>
+              <span class="meta-badge" id="modal-duration">2h 46m</span>
+              <span class="meta-badge quality" id="modal-quality">4K Ultra HD</span>
+              <span class="meta-badge" id="modal-audio">Dolby Atmos</span>
+            </div>
+            <p class="modal-desc" id="modal-description"></p>
+          </div>
+          <div class="modal-details-right">
+            <div class="meta-field"><span class="meta-label">Cast: </span><span class="meta-val" id="modal-cast"></span></div>
+            <div class="meta-field"><span class="meta-label">Director: </span><span class="meta-val" id="modal-director"></span></div>
+            <div class="meta-field"><span class="meta-label">Genres: </span><span class="meta-val" id="modal-genres"></span></div>
+          </div>
+        </div>
+        <div class="modal-related-wrap">
+          <h3>More Like This</h3>
+          <div class="related-grid" id="modal-related-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Player -->
+  <div class="player-modal" id="video-player-modal">
+    <div class="player-top-bar">
+      <div class="player-title-info">
+        <h3 id="player-movie-title">Playing Title</h3>
+        <span id="player-movie-meta">2024 &bull; 4K UHD</span>
+      </div>
+      <div class="player-top-actions">
+        <button class="player-mode-btn" id="player-mode-switch">🍿 Switch to Full Stream Movie</button>
+        <button class="player-exit-btn" id="player-close-btn">✕</button>
+      </div>
+    </div>
+    <div class="player-screen">
+      <div class="player-media-wrap" id="player-youtube-wrap">
+        <iframe id="player-youtube-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="player-media-wrap" id="player-html5-wrap" style="display: none;">
+        <video id="player-html5-video" playsinline></video>
+        <div class="player-controls-overlay">
+          <div class="player-progress-bar-wrap" id="player-progress-bar">
+            <div class="player-progress-fill" id="player-progress-fill"></div>
+          </div>
+          <div class="player-bottom-controls">
+            <div class="controls-left">
+              <button class="ctrl-btn" id="player-play-pause">❚❚</button>
+              <button class="ctrl-btn" id="player-rewind-btn">⏪ 10</button>
+              <button class="ctrl-btn" id="player-forward-btn">10 ⏩</button>
+              <div class="player-volume-control">
+                <button class="ctrl-btn" id="player-volume-btn">🔊</button>
+                <input type="range" class="volume-slider" id="player-volume-slider" min="0" max="1" step="0.05" value="1">
+              </div>
+              <div class="player-time-display"><span id="player-current-time">00:00</span> / <span id="player-total-time">00:00</span></div>
+            </div>
+            <div class="controls-right">
+              <span class="meta-badge quality">4K ULTRA HD</span>
+              <button class="ctrl-btn" id="player-fullscreen-btn">⛶</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authentication Modal (Sign In / Sign Up) -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="auth-box">
+      <button class="modal-close-btn" id="auth-modal-close" aria-label="Close modal">✕</button>
+      <div class="auth-header">
+        <div class="auth-logo">🎬 CineMate</div>
+        <p class="auth-tagline">Unlimited movies, TV shows, and more.</p>
+      </div>
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="auth-tab-signin">Sign In</button>
+        <button type="button" class="auth-tab-btn" id="auth-tab-signup">Sign Up</button>
+      </div>
+      <form id="auth-form-signin">
+        <div class="auth-form-group">
+          <label class="auth-label" for="auth-signin-email">Email or Username</label>
+          <div class="auth-input-wrap">
+            <input type="text" id="auth-signin-email" class="auth-input" placeholder="e.g. samadhi@cinemate.io" value="samadhi@cinemate.io" required>
+          </div>
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-label" for="auth-signin-pwd">Password</label>
+          <div class="auth-input-wrap">
+            <input type="password" id="auth-signin-pwd" class="auth-input" placeholder="Enter password" value="••••••••" required>
+            <button type="button" class="auth-pwd-toggle" title="Toggle password">👁️</button>
+          </div>
+        </div>
+        <div class="auth-options-row">
+          <label class="auth-checkbox-label">
+            <input type="checkbox" id="auth-remember" checked>
+            <span>Remember me</span>
+          </label>
+          <a href="javascript:void(0)" class="auth-link" onclick="CineApp.showToast('Password reset link sent to your email', 'info')">Forgot password?</a>
+        </div>
+        <button type="submit" class="auth-submit-btn">Sign In to CineMate</button>
+        <button type="button" class="auth-demo-btn" id="auth-demo-btn">⚡ Demo 1-Click VIP Login</button>
+        <div class="auth-footer-switch">
+          New to CineMate? <span class="auth-link" onclick="document.getElementById('auth-tab-signup').click()">Sign up now</span>.
+        </div>
+      </form>
+      <form id="auth-form-signup" style="display: none;">
+        <div class="auth-form-group">
+          <label class="auth-label" for="auth-signup-name">Full Name</label>
+          <input type="text" id="auth-signup-name" class="auth-input" placeholder="Your name" required>
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-label" for="auth-signup-email">Email Address</label>
+          <input type="email" id="auth-signup-email" class="auth-input" placeholder="name@example.com" required>
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-label" for="auth-signup-pwd">Create Password</label>
+          <div class="auth-input-wrap">
+            <input type="password" id="auth-signup-pwd" class="auth-input" placeholder="At least 6 characters" required>
+            <button type="button" class="auth-pwd-toggle" title="Toggle password">👁️</button>
+          </div>
+        </div>
+        <div class="auth-options-row">
+          <label class="auth-checkbox-label">
+            <input type="checkbox" checked required>
+            <span>I agree to the Terms of Service & Privacy</span>
+          </label>
+        </div>
+        <button type="submit" class="auth-submit-btn">Create Free Account</button>
+        <div class="auth-footer-switch">
+          Already have an account? <span class="auth-link" onclick="document.getElementById('auth-tab-signin').click()">Sign in</span>.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Help Center & FAQ Modal -->
+  <div class="modal-overlay" id="help-modal">
+    <div class="info-modal-box">
+      <div class="info-modal-header">
+        <h3>❓ CineMate Help Center & FAQ</h3>
+        <button class="modal-close-btn" style="position: static;" aria-label="Close">✕</button>
+      </div>
+      <div class="info-modal-body">
+        <div class="faq-search-box">
+          <input type="text" id="faq-search-input" placeholder="Search questions, streaming issues, billing...">
+        </div>
+        <div class="faq-accordion-item active">
+          <div class="faq-question"><span>What is CineMate?</span><span class="faq-toggle-icon">+</span></div>
+          <div class="faq-answer">CineMate is a premier on-demand streaming platform providing thousands of blockbuster movies, series, trailers, and documentaries in Ultra HD 4K with Dolby Atmos audio.</div>
+        </div>
+        <div class="faq-accordion-item">
+          <div class="faq-question"><span>How do I stream in 4K Ultra HD?</span><span class="faq-toggle-icon">+</span></div>
+          <div class="faq-answer">4K Ultra HD playback is enabled automatically for compatible screens and devices with high-speed internet connections (25 Mbps or higher recommended).</div>
+        </div>
+        <div class="faq-accordion-item">
+          <div class="faq-question"><span>How does My Watchlist work?</span><span class="faq-toggle-icon">+</span></div>
+          <div class="faq-answer">Click the "+" button on any movie card or details modal. Titles are immediately saved to your personalized "My List" page.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supported Devices Modal -->
+  <div class="modal-overlay" id="devices-modal">
+    <div class="info-modal-box">
+      <div class="info-modal-header">
+        <h3>📱 Supported Devices & Platforms</h3>
+        <button class="modal-close-btn" style="position: static;" aria-label="Close">✕</button>
+      </div>
+      <div class="info-modal-body">
+        <p style="margin-bottom: 20px; color: var(--text-secondary);">Stream CineMate in pristine 4K HDR and spatial sound on all screens:</p>
+        <div class="devices-grid">
+          <div class="device-card"><div class="device-icon">📺</div><h4>Smart TVs</h4><p>Samsung, LG, Sony Bravia, Google TV</p></div>
+          <div class="device-card"><div class="device-icon">📱</div><h4>Mobile & Tablets</h4><p>iOS (iPhone/iPad) & Android</p></div>
+          <div class="device-card"><div class="device-icon">💻</div><h4>Computers</h4><p>Chrome, Edge, Safari, Firefox</p></div>
+          <div class="device-card"><div class="device-icon">🎮</div><h4>Consoles</h4><p>PlayStation 5 & Xbox Series X</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms Modal -->
+  <div class="modal-overlay" id="terms-modal">
+    <div class="info-modal-box">
+      <div class="info-modal-header">
+        <h3>📜 CineMate Terms of Service & Privacy</h3>
+        <button class="modal-close-btn" style="position: static;" aria-label="Close">✕</button>
+      </div>
+      <div class="info-modal-body">
+        <h4 style="color: #fff; margin-bottom: 8px;">1. Service Overview</h4>
+        <p style="margin-bottom: 16px; font-size: 14px; color: var(--text-secondary);">CineMate provides an on-demand digital entertainment streaming experience with high definition and 4K Ultra HD video playback.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-notifications-container"></div>
+
+  <!-- Professional Enterprise Streaming Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <h2>🎬 CineMate</h2>
+        <p>Stream thousands of blockbuster movies, award-winning original series, and exclusive releases on all your favorite devices in 4K Ultra HD with Dolby Atmos audio.</p>
+        <div class="footer-lang-selector">
+          <span>🌐</span>
+          <select aria-label="Language selector">
+            <option value="en" selected>English (US)</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+        <div class="system-status-badge">
+          <span class="system-status-dot"></span>
+          <span>All Streaming Systems Operational</span>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <h3>Browse & Watch</h3>
+        <a href="index.html">Streaming Home</a>
+        <a href="movies.html">All Movies</a>
+        <a href="tv-shows.html">TV Shows & Series</a>
+        <a href="favourites.html">My Watchlist</a>
+        <a href="movies.html?genre=Sci-Fi">Sci-Fi Blockbusters</a>
+        <a href="movies.html?genre=Action">Action & Adventure</a>
+      </div>
+
+      <div class="footer-links">
+        <h3>Help & Support</h3>
+        <a href="javascript:void(0)" onclick="CineApp.openHelpModal()">Help Center & FAQ</a>
+        <a href="javascript:void(0)" onclick="CineApp.openDevicesModal()">Supported Devices</a>
+        <a href="javascript:void(0)" onclick="CineApp.openAuthModal('signin')">Account & Sign In</a>
+        <a href="javascript:void(0)" onclick="CineApp.openAuthModal('signup')">Create Free Account</a>
+        <a href="javascript:void(0)" onclick="CineApp.showToast('Audio set to Dolby Atmos 5.1 Auto-Detect', 'info')">Audio Settings</a>
+        <a href="javascript:void(0)" onclick="CineApp.showToast('Speed Test: 124 Mbps — 4K Ultra HD Ready', 'success')">Network Speed Test</a>
+      </div>
+
+      <div class="footer-links">
+        <h3>Company & Legal</h3>
+        <a href="javascript:void(0)" onclick="CineApp.openTermsModal()">About CineMate</a>
+        <a href="javascript:void(0)" onclick="CineApp.showToast('Press Kit downloaded', 'info')">Media Center</a>
+        <a href="javascript:void(0)" onclick="CineApp.openTermsModal()">Terms of Use</a>
+        <a href="javascript:void(0)" onclick="CineApp.openTermsModal()">Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 CineMate Entertainment, Inc. All rights reserved.</p>
+      <div class="footer-security-chips">
+        <span>4K UHD</span> &bull; 
+        <span>Dolby Atmos</span> &bull; 
+        <span>SSL Encrypted</span> &bull; 
+        <span>DRM Protected</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="movies-data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    function renderMyListPage() {
+      const grid = document.getElementById("my-list-grid");
+      const countDisplay = document.getElementById("watchlist-count-display");
+      const clearBtn = document.getElementById("clear-watchlist-btn");
+      if (!grid) return;
+
+      const listIds = CineApp.watchlist || [];
+      const movies = listIds.map(id => CineDB.getById(id)).filter(Boolean);
+
+      if (countDisplay) {
+        countDisplay.textContent = `${movies.length} Title${movies.length === 1 ? '' : 's'}`;
+      }
+      if (clearBtn) {
+        clearBtn.style.display = movies.length > 0 ? "inline-block" : "none";
+      }
+
+      grid.innerHTML = "";
+      if (movies.length === 0) {
+        grid.innerHTML = `
+          <div class="search-empty-state">
+            <div class="empty-icon">❤️</div>
+            <h3>Your Watchlist is Empty</h3>
+            <p>Save movies and shows by clicking the "+" button on any title card or details page, so you never lose track of what to watch next!</p>
+            <a href="index.html" class="primary-btn" style="display: inline-block;">Browse Trending Movies</a>
+          </div>
+        `;
+        return;
+      }
+
+      movies.forEach(m => grid.appendChild(CineApp.createMovieCard(m)));
+    }
+
+    function clearAllWatchlist() {
+      if (confirm("Are you sure you want to clear your entire watchlist?")) {
+        CineApp.watchlist = [];
+        CineApp.saveWatchlist();
+        renderMyListPage();
+        CineApp.showToast("Cleared your watchlist");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderMyListPage();
+    });
+  </script>
+</body>
+</html>
+
