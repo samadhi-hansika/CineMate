@@ -14,6 +14,7 @@ const CineApp = {
   STORAGE_RATED: "cinemate_rated_v1",
   STORAGE_USER: "cinemate_user_session_v1",
   STORAGE_SESSION_USER: "cinemate_user_session_current",
+  STORAGE_AUTHENTICATED: "cinemate_authenticated_v1",
   STORAGE_SETTINGS: "cinemate_settings_v1",
 
   // State
@@ -64,7 +65,10 @@ const CineApp = {
       const storedUser =
         localStorage.getItem(this.STORAGE_USER) ||
         sessionStorage.getItem(this.STORAGE_SESSION_USER);
-      if (storedUser) {
+      const authenticated =
+        localStorage.getItem(this.STORAGE_AUTHENTICATED) === "true" ||
+        sessionStorage.getItem(this.STORAGE_AUTHENTICATED) === "true";
+      if (storedUser && authenticated) {
         this.currentUser = JSON.parse(storedUser);
       } else {
         this.currentUser = null;
@@ -382,10 +386,14 @@ const CineApp = {
 
     if (remember) {
       localStorage.setItem(this.STORAGE_USER, JSON.stringify(this.currentUser));
+      localStorage.setItem(this.STORAGE_AUTHENTICATED, "true");
       sessionStorage.removeItem(this.STORAGE_SESSION_USER);
+      sessionStorage.removeItem(this.STORAGE_AUTHENTICATED);
     } else {
       sessionStorage.setItem(this.STORAGE_SESSION_USER, JSON.stringify(this.currentUser));
+      sessionStorage.setItem(this.STORAGE_AUTHENTICATED, "true");
       localStorage.removeItem(this.STORAGE_USER);
+      localStorage.removeItem(this.STORAGE_AUTHENTICATED);
     }
     this.updateAuthUI();
     this.closeAuthModal();
@@ -406,7 +414,9 @@ const CineApp = {
     };
 
     localStorage.setItem(this.STORAGE_USER, JSON.stringify(this.currentUser));
+    localStorage.setItem(this.STORAGE_AUTHENTICATED, "true");
     sessionStorage.removeItem(this.STORAGE_SESSION_USER);
+    sessionStorage.removeItem(this.STORAGE_AUTHENTICATED);
     this.updateAuthUI();
     this.closeAuthModal();
     this.showToast(`Welcome to CineMate, ${name}! Your account is active.`, "success");
@@ -420,7 +430,9 @@ const CineApp = {
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
     };
     localStorage.setItem(this.STORAGE_USER, JSON.stringify(this.currentUser));
+    localStorage.setItem(this.STORAGE_AUTHENTICATED, "true");
     sessionStorage.removeItem(this.STORAGE_SESSION_USER);
+    sessionStorage.removeItem(this.STORAGE_AUTHENTICATED);
     this.updateAuthUI();
     this.closeAuthModal();
     this.showToast("Logged in with Demo VIP Account!", "success");
@@ -429,7 +441,9 @@ const CineApp = {
   logout() {
     this.currentUser = null;
     localStorage.removeItem(this.STORAGE_USER);
+    localStorage.removeItem(this.STORAGE_AUTHENTICATED);
     sessionStorage.removeItem(this.STORAGE_SESSION_USER);
+    sessionStorage.removeItem(this.STORAGE_AUTHENTICATED);
     this.updateAuthUI();
     this.showToast("Signed out successfully. See you soon!");
   },
