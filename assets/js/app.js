@@ -58,7 +58,18 @@ const CineApp = {
    * ----------------------------------------------------------- */
   loadState() {
     try {
-      this.watchlist = JSON.parse(localStorage.getItem(this.STORAGE_WATCHLIST)) || [];
+      const savedWatchlist =
+        JSON.parse(localStorage.getItem(this.STORAGE_WATCHLIST)) || [];
+      const demoWatchlist = ["interstellar", "dune-part-two", "arcane"];
+      const isDemoWatchlist =
+        Array.isArray(savedWatchlist) &&
+        savedWatchlist.length === demoWatchlist.length &&
+        demoWatchlist.every((id) => savedWatchlist.includes(id));
+
+      this.watchlist = isDemoWatchlist ? [] : savedWatchlist;
+      if (isDemoWatchlist) {
+        localStorage.setItem(this.STORAGE_WATCHLIST, JSON.stringify(this.watchlist));
+      }
       this.continueWatching =
         JSON.parse(localStorage.getItem(this.STORAGE_CONTINUE)) || [];
       this.ratedMovies = JSON.parse(localStorage.getItem(this.STORAGE_RATED)) || {};
