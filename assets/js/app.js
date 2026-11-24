@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const CineApp = {
+  DEFAULT_TRAILER_VIDEO:
+    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+
   // Local storage keys
   STORAGE_WATCHLIST: "cinemate_watchlist_v1",
   STORAGE_CONTINUE: "cinemate_continue_watching_v1",
@@ -1334,7 +1337,7 @@ const CineApp = {
     }
   },
 
-  openPlayer(movie, mode = "trailer") {
+  openPlayer(movie, mode = "stream") {
     if (!movie) return;
     this.playerState.currentMovie = movie;
     this.playerState.mode = mode;
@@ -1373,16 +1376,34 @@ const CineApp = {
       if (video) video.pause();
       if (iframe && movie.trailerYoutubeId) {
         iframe.src = `https://www.youtube-nocookie.com/embed/${movie.trailerYoutubeId}?autoplay=1&rel=0&modestbranding=1&controls=1`;
+      } else if (iframe) {
+        iframe.src = "";
+        this.showToast("Official trailer unavailable. Showing demo preview.", "info");
       }
-      if (switchBtn) switchBtn.innerHTML = `🍿 Switch to Full Stream Movie`;
+      if (switchBtn) switchBtn.innerHTML = `🍿 Switch to Video Preview`;
     } else {
-      // Show HTML5 Video Stream
+      // Show HTML5 demo preview
       if (youtubeWrap) youtubeWrap.style.display = "none";
       if (iframe) iframe.src = "";
       if (html5Wrap) html5Wrap.style.display = "block";
-      if (video && movie.videoUrl) {
-        video.src = movie.videoUrl;
-        video.play().catch(e => console.log("Autoplay blocked:", e));
+      if (video) {
+        video.src = movie.videoUrl || this.DEFAULT_TRAILER_VIDEO;
+        video.setAttribute("aria-label", `${movie.title} video preview`);
+        video.muted = false;
+        video.load();
+        const playWhenReady = () => {
+          video.play().catch((error) => {
+            video.muted = true;
+            video.play().catch(() => {
+              console.log("Playback blocked:", error);
+            });
+          });
+        };
+        if (video.readyState >= 2) {
+          playWhenReady();
+        } else {
+          video.addEventListener("canplay", playWhenReady, { once: true });
+        }
       }
       if (switchBtn) switchBtn.innerHTML = `🎬 Switch to Official Trailer`;
     }
