@@ -54,22 +54,21 @@
 
 ```
 CineMate/
-├── index.html                 # Main streaming homepage with Hero, Carousels, Player & Modals
-├── movies.html                # Dedicated All-Movies catalog with filter toolbar
-├── tv-shows.html              # Dedicated TV Series catalog with episodes explorer
-├── favourites.html            # "My List" / Saved Watchlist management page
-├── favourities.html           # Backward-compatibility alias redirecting to favourites.html
-├── style.css                  # Netflix dark theme, layout grids, animations & player styles
-├── movies-data.js             # Comprehensive dataset of 25+ movies and TV series
-├── app.js                     # Core application engine (state, events, carousels, player)
-├── Dune-part2.jpg             # Local high-res poster
-├── Get Out.jpg                # Local high-res poster
-├── inception.jpg              # Local high-res poster
-├── Interstellar_film_poster.jpg # Local high-res poster
-├── Oppenheimer.jpg            # Local high-res poster
-├── Smile 2.jpg                # Local high-res poster
-├── TheDarkKnight.jpg          # Local high-res poster
-├── search-pannel.jpg          # Local graphic asset
+├── index.html                 # Main streaming homepage
+├── movies.html                # Movies catalog
+├── tv-shows.html              # TV series catalog
+├── favourites.html            # Saved watchlist
+├── favourities.html           # Backward-compatible redirect
+├── assets/
+│   ├── css/
+│   │   └── style.css          # Main theme and responsive styles
+│   ├── js/
+│   │   ├── app.js             # Application logic
+│   │   └── movies-data.js     # Movies and TV series dataset
+│   └── images/                # Local posters and graphic assets
+├── scripts/
+│   ├── download-posters.js    # Poster downloader
+│   └── download-remaining.js  # Remaining poster downloader
 └── README.md                  # Project documentation
 ```
 

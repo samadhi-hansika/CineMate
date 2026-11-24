@@ -841,7 +841,7 @@ const CineApp = {
       card.innerHTML = `
         <div class="top10-rank-num">${rank}</div>
         <div class="top10-poster-wrap" onclick="CineApp.openMovieModal(CineDB.getById('${movie.id}'))">
-          <img src="${movie.poster}" alt="${movie.title}" loading="lazy" onerror="this.src='search-pannel.jpg'">
+          <img src="${movie.poster}" alt="${movie.title}" loading="lazy"           onerror="this.src='assets/images/search-pannel.jpg'">
           <div class="card-hover-overlay">
             <div class="hover-btn-group">
               <button class="hover-btn play" title="Play" onclick="event.stopPropagation(); CineApp.openPlayer(CineDB.getById('${movie.id}'))">▶</button>
@@ -871,7 +871,7 @@ const CineApp = {
     card.innerHTML = `
       <div class="card-inner" onclick="CineApp.openMovieModal(CineDB.getById('${movie.id}'))">
         <div class="poster-container">
-          <img src="${movie.poster}" alt="${movie.title}" loading="lazy" onerror="this.src='search-pannel.jpg'">
+          <img src="${movie.poster}" alt="${movie.title}" loading="lazy"           onerror="this.src='assets/images/search-pannel.jpg'">
           ${movie.badges && movie.badges[0] ? `<span class="card-badge">${movie.badges[0]}</span>` : ""}
         </div>
         <div class="card-preview">
@@ -1493,4 +1493,3 @@ const CineApp = {
     }
   }
 };
-

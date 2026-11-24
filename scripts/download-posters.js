@@ -54,7 +54,7 @@ function downloadFile(url, dest) {
 (async () => {
   console.log(`Starting download of ${targets.length} movie posters...`);
   for (const item of targets) {
-    const dest = path.join(__dirname, item.name);
+    const dest = path.join(__dirname, '..', 'assets', 'images', item.name);
     try {
       await downloadFile(item.url, dest);
       const stat = fs.statSync(dest);
