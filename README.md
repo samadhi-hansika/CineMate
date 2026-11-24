@@ -94,4 +94,4 @@ CineMate/
 
 - **Developer**: Samadhi
 - **Platform**: CineMate Global Streaming Entertainment
-- **Inspiration**: Netflix, TMDB
+- **Inspiration**: Netflix
