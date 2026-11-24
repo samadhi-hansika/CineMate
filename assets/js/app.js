@@ -58,11 +58,9 @@ const CineApp = {
    * ----------------------------------------------------------- */
   loadState() {
     try {
-      this.watchlist = JSON.parse(localStorage.getItem(this.STORAGE_WATCHLIST)) || ["interstellar", "dune-part-two", "arcane"];
-      this.continueWatching = JSON.parse(localStorage.getItem(this.STORAGE_CONTINUE)) || [
-        { id: "dune-part-two", progress: 68, lastWatched: Date.now() - 3600000 },
-        { id: "stranger-things", progress: 42, lastWatched: Date.now() - 86400000 }
-      ];
+      this.watchlist = JSON.parse(localStorage.getItem(this.STORAGE_WATCHLIST)) || [];
+      this.continueWatching =
+        JSON.parse(localStorage.getItem(this.STORAGE_CONTINUE)) || [];
       this.ratedMovies = JSON.parse(localStorage.getItem(this.STORAGE_RATED)) || {};
 
       const storedUser =
@@ -77,7 +75,7 @@ const CineApp = {
         this.currentUser = null;
       }
     } catch (e) {
-      this.watchlist = ["interstellar", "dune-part-two"];
+      this.watchlist = [];
       this.continueWatching = [];
       this.ratedMovies = {};
       this.currentUser = null;
