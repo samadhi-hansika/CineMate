@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const CineApp = {
-  DEFAULT_TRAILER_VIDEO:
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+  DEFAULT_PREVIEW_VIDEO:
+    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
 
   // Local storage keys
   STORAGE_WATCHLIST: "cinemate_watchlist_v1",
@@ -31,7 +31,7 @@ const CineApp = {
   heroAutoPlayTimer: null,
   playerState: {
     isPlaying: false,
-    mode: "trailer", // 'trailer' | 'stream'
+    mode: "trailer",
     currentMovie: null
   },
 
@@ -1261,6 +1261,10 @@ const CineApp = {
     }
 
     if (video) {
+      video.addEventListener("error", () => {
+        this.showToast("Video preview could not be loaded. Try the official trailer.", "error");
+      });
+
       video.addEventListener("timeupdate", () => {
         if (!video.duration) return;
         const pct = (video.currentTime / video.duration) * 100;
@@ -1346,7 +1350,7 @@ const CineApp = {
     }
   },
 
-  openPlayer(movie, mode = "stream") {
+  openPlayer(movie, mode = "trailer") {
     if (!movie) return;
     this.playerState.currentMovie = movie;
     this.playerState.mode = mode;
@@ -1396,7 +1400,7 @@ const CineApp = {
       if (iframe) iframe.src = "";
       if (html5Wrap) html5Wrap.style.display = "block";
       if (video) {
-        video.src = movie.videoUrl || this.DEFAULT_TRAILER_VIDEO;
+        video.src = this.DEFAULT_PREVIEW_VIDEO;
         video.setAttribute("aria-label", `${movie.title} video preview`);
         video.muted = false;
         video.load();
